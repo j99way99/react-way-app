@@ -1,38 +1,50 @@
 const express = require("express");
 const serverResponses = require("../utils/helpers/responses");
 const messages = require("../config/messages");
-const { Todo } = require("../models/todos/todo");
+const {Todo} = require("../models/todos/todo");
+const {User} = require("../models/todos/user")
 
 const routes = (app) => {
-  const router = express.Router();
+    const router = express.Router();
 
-  router.post("/todos", (req, res) => {
-    const todo = new Todo({
-      text: req.body.text,
+    router.post('/join', (req, res) => {
+      const user = new User(req.body);
+      user.save((err, userInfo) => {
+        if(err) return res.json({success: false, err});
+        return res.status(200).json({
+          success: true
+        });
+      }); //mongoDB method
     });
 
-    todo
-      .save()
-      .then((result) => {
-        serverResponses.sendSuccess(res, messages.SUCCESSFUL, result);
-      })
-      .catch((e) => {
-        serverResponses.sendError(res, messages.BAD_REQUEST, e);
-      });
-  });
+    router.post("/todos", (req, res) => {
+        const todo = new Todo({
+            text: req.body.text,
+        });
 
-  router.get("/", (req, res) => {
-    Todo.find({}, { __v: 0 })
-      .then((todos) => {
-        serverResponses.sendSuccess(res, messages.SUCCESSFUL, todos);
-      })
-      .catch((e) => {
-        serverResponses.sendError(res, messages.BAD_REQUEST, e);
-      });
-  });
+        todo
+            .save()
+            .then((result) => {
+                serverResponses.sendSuccess(res, messages.SUCCESSFUL, result);
+            })
+            .catch((e) => {
+                serverResponses.sendError(res, messages.BAD_REQUEST, e);
+            });
+    });
 
-  //it's a prefix before api it is useful when you have many modules and you want to
-  //differentiate b/w each module you can use this technique
-  app.use("/api", router);
+
+    router.get("/", (req, res) => {
+        Todo.find({}, {__v: 0})
+            .then((todos) => {
+                serverResponses.sendSuccess(res, messages.SUCCESSFUL, todos);
+            })
+            .catch((e) => {
+                serverResponses.sendError(res, messages.BAD_REQUEST, e);
+            });
+    });
+
+    //it's a prefix before api it is useful when you have many modules and you want to
+    //differentiate b/w each module you can use this technique
+    app.use("/api", router);
 };
 module.exports = routes;

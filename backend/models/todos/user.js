@@ -1,3 +1,6 @@
+/**
+ * User
+ */
 const mongoose = require('mongoose');
 const userSchema = mongoose.Schema({
     name: {
@@ -30,5 +33,5 @@ const userSchema = mongoose.Schema({
     }
 });
 
-const User = mongoose.model('User', userSchema);//모델명, 스키마
-module.exports = { User } //다른곳에서 사용가능 하도록 export
+const user = mongoose.model('user', userSchema);//모델명, 스키마
+module.exports = { user } //다른곳에서 사용가능 하도록 export
